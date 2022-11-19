@@ -29,5 +29,5 @@ L'*script* suporta tres modes:
 
 L'ús típic per a compilar un programa seria:
 ```
-python -i examples/table_primes.mixal -o table_primes.deck
+python mixala.py -i examples/table_primes.mixal -o table_primes.deck
 ```
