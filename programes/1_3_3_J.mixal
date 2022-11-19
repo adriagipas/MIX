@@ -1,0 +1,98 @@
+* Analogous to Program I
+* 1.3.3 Program J
+*
+* L'algorisme original és un troç de codi d'un programa que té les
+* dades carregades. El troç de codi que carrega les dades i les mostra
+* per pantalla és meu.  El format és un número en cada paraula en
+* digits decimals. Una paraula que siguen tot espais indica fi de
+* números. S'enten que el primer número és X[1], el segon X[2], etc. i
+* que X és una permutació.
+
+* Buffer i macros. X2 és un buffer con carrege les dades, X=X2-1 i és
+* el buffer on que espera trobar l'algorisme, ja que el pimer element
+* és X[1]. Aprofit per a guardar en X[0] la llargaria.
+MAXWDS   EQU    1200
+         ORIG   100
+X        EQU    *
+N        ORIG   *+1
+X2       ORIG   *+MAXWDS
+OUTBUF   ORIG   *+24
+CARDS    EQU    16
+PRINTER  EQU    18
+
+* Carrega dades. I1 (Valor provisional de N) I2 (posició en el buffer)
+* I3 (iterador)
+BEGIN    ENT1   0
+         ENT2   0
+3H       IN     X2,2(CARDS)
+         ENT3   16
+         JBUS   *(CARDS)                 
+2H       LDX    X2,2
+         JXZ    1F
+         ENTA   0
+         NUM
+         STA    X2,2
+         INC1   1
+         INC2   1
+         DEC3   1
+         J3NZ   2B
+         CMP2   =MAXWDS-16=
+         JLE    3B
+         HLT    666
+1H       J1Z    *-1
+         ST1    N
+
+* L'algorisme. ST1 X+N+1, sols funciona si N és una constant en temps
+* de compilació.
+	 
+*	 ENN1	N
+*	 ENT1	
+*	 ST1	X+N+1,1(0:0)
+*	 INC1	1
+*	 J1N	*-2
+	 ENT2	-1
+	 ENT1	0
+	 ST2	X+1,1(0:0)
+	 INC1	1
+	 CMP1	N
+	 JNE	*-3
+*	 ENT1	N
+	 LD1	N
+2H	 ENN3	0,1
+	 ENN2	0,3
+	 LD3N	X,2
+	 J3N	*-2
+	 LDA	X,3
+	 STA	X,2
+	 ST1	X,3
+	 DEC1	1
+	 J1P	2B
+
+* Mostra el vector X per pantalla. Vaig a fer-ho fàcil, faré el procés
+* contrari, en cada paraula un element, podria currarme-ho més, però
+* tenint en compte les ganes i que és el primer codi que programe jo
+* ja està prou be. I1 (iterador), I2 (iterador sobre X), I3 (iterador
+* sobre el buffer)
+         LD1    N
+         ENT2   0
+         ENT3   -24
+2H       LDA    X2,2
+         CHAR
+         STX    OUTBUF+24,3
+         INC2   1
+         INC3   1
+	 J3N	1F
+         OUT    OUTBUF(PRINTER)
+         ENT3   -24
+         JBUS   *(PRINTER)
+1H       DEC1   1
+         J1NZ   2B
+	 CMP3	=-24=
+         JE     1F
+2H       STZ    OUTBUF+24,3
+         INC3   1
+	 J3N	2B
+         OUT    OUTBUF(PRINTER)
+         JBUS   *(PRINTER)
+1H       HLT
+         END     BEGIN

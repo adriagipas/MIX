@@ -1,0 +1,109 @@
+* Topological sort
+* 2.2.3 Program T
+
+* BUFFER I MACROS
+* El buffer sobreescriu el carregador, fique 101 per a què la constant
+* no solape amb el carregador.
+COUNT	 EQU	2:3
+QLINK	 EQU	2:3
+TOP	 EQU	4:5
+SUC	 EQU	2:3
+NEXT	 EQU	4:5
+TAPEIN	 EQU	1
+TAPEOUT	 EQU	2
+BUFFER	 ORIG	*+101
+	 CON	-1
+
+* FASE DE LECTURA
+* Llig la targeta
+TOPSORT	 IN	BUFFER(TAPEIN)
+	 JBUS	*(TAPEIN)
+* Inicialitza la memòria de la taula X a 0. R6 és el número
+* d'elements.
+1H	 LD6	BUFFER+1
+	 ENT4	0,6
+	 STZ	X,4
+	 DEC4	1
+	 J4NN	*-2
+* Prepara per a llegir el primer element. R5 és el punter en el
+* buffer. R2 és la posició de l'última paraula no lliure en memòria.
+	 ENT2	X,6
+	 ENT5	BUFFER+2
+* Llig el següent i comprova, asumint que va per parelles, si és
+* l'última parella o si hi ha que llegir més. R3 és el primer element
+* de la parella.
+2H	 LD3	0,5
+	 J3P	3F
+	 J3Z	4F
+	 IN	BUFFER(TAPEIN)
+	 JBUS	*(TAPEIN)
+	 ENT5	BUFFER
+	 JMP	2B
+* Actualitza la relació. R4 és el segon element de la parella.
+3H	 LD4	1,5
+	 LDA	X,4(COUNT)
+	 INCA	1
+	 STA	X,4(COUNT)
+	 INC2	1
+	 LDA	X,3(TOP)
+	 STA	0,2(NEXT)
+	 ST4	0,2(SUC)
+	 ST2	X,3(TOP)
+	 INC5	2
+	 JMP	2B
+* En aquest punt ja s'han llegit totes les relacions. Es rebobina la
+* cinta.
+4H	 IOC	0(TAPEIN)
+* Inicialitza la cinta d'eixida amb tots aquells nodes que no tenen
+* predecessors i per tant poden ser nodes inicials. També inicialita
+* R5 que és el punter del buffer. R4 és l'iterador sobre el nombre
+* d'elements, començant pel final. X[0] és gasta com el primer element
+* de la cola QLINK. QLINK és una cola de manera que sempre ens quedem
+* en l'acreça de l'últim element insertat encara que apunten cap
+* avant, de manera que per a processar-la tornarem al principi que
+* està fixat en QLINK[0] i podrem processar els element en l'ordre
+* d'inserció.
+	 ENT4	0,6
+	 ENT5	-100
+	 ENT3	0
+4H	 LDA	X,4(COUNT)
+	 JAP	*+3
+	 ST4	X,3(QLINK)
+	 ENT3	0,4
+	 DEC4	1
+	 J4P	4B
+
+* FASE 'SORT' Inicialitza el processament de la cola, llig el primer
+* element encolat.
+	 LD1	X(QLINK)
+* Imprimeix el valor i si es cero acaba, si no actualitza estructures.
+5H	 JBUS	*(TAPEOUT)
+	 ST1	BUFFER+100,5
+	 J1Z	8F
+	 INC5	1
+	 J5N	*+3
+	 OUT	BUFFER(TAPEOUT)
+	 ENT5	-100
+* Esta secció es la que recorre tots els successors del node imprimit,
+* restant u al comptador de cada sucessor i ficant-los en QLINK si el
+* comptador és cero.
+	 DEC6	1
+	 LD2	X,1(TOP)
+	 J2Z	7F
+6H	 LD4	0,2(SUC)
+	 LDA	X,4(COUNT)
+	 DECA	1
+	 STA	X,4(COUNT)
+	 JAP	*+3
+	 ST4	X,3(QLINK)
+	 ENT3	0,4
+	 LD2	0,2(NEXT)
+	 J2P	6B
+* Bucle
+7H	 LD1	X,1(QLINK)
+	 JMP	5B
+* Finalitza.
+8H	 OUT	BUFFER(TAPEOUT)
+	 IOC	0(TAPEOUT)
+	 HLT	0,6
+X	 END	TOPSORT

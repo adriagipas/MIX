@@ -1,0 +1,12 @@
+* Programa que avança una cinta de 100 blocs i després la
+* rebobina. L'objectiu es veure el comportament de tornar a executar el
+* programa mentre la cinta encara està rebobinant-se. Si funciona bé
+* el programa la interfície de la cinta sempre estarà ocupat i el
+* programa es quedarà esperant a què el dispositiu quede lliure.
+
+TAPE	EQU   0
+	ORIG  101
+REWIND	IOC   100(TAPE)
+	IOC   0(TAPE)
+	HLT
+	END   REWIND 
