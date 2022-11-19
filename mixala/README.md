@@ -11,17 +11,17 @@ python mixala.py --help
 
 L'*script* suporta tres modes:
 
-- ASCII: mostra una representació de com quedaria el codi binari en
-  memòria.
+- **ASCII**: mostra una representació de com quedaria el codi binari
+  en memòria.
 
-- PUNCHCARD: Codifica directament el codi binari resultant en targetes
-  perforades (cada línia de text representa una targeta). És molt
-  limitat perquè no totes les instruccions es poden codificar
+- **PUNCHCARD**: Codifica directament el codi binari resultant en
+  targetes perforades (cada línia de text representa una targeta). És
+  molt limitat perquè no totes les instruccions es poden codificar
   directament utilitzant el joc de caràcters de les targetes. Servix
   principalment per compilar el carregador.
 
-- DECK: Codifica el codi binari resultant en targetes perforades (cada
-  línia de text representa una targeta) emprant una codificació
+- **DECK**: Codifica el codi binari resultant en targetes perforades
+  (cada línia de text representa una targeta) emprant una codificació
   especial que ha de ser descodificada per un carregador. Aquest mode
   inserix al principi el codi del carregador. L'única restricció és
   que el programa no pot fer referència a adreces menor o iguals a
